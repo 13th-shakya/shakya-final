@@ -35,4 +35,16 @@ This command renders the Overpass API result and exports it as SVG.
 
 ## 4. Add colors and labels to the SVG using Inkscape
 
+1. Add Colors: Use the fill tool to add colors to campus buildings, areas, or boundaries based.
+
+2. Add Labels: Use the text tool to add building names or other annotations.
+
+Save two versions of the map:
+
+With Labels: ntut-colored-labeled.svg
+
+Without Labels: ntut-colored.svg
+
 ## 5. Add the SVG to the Android project
+
+Place the generated ntut-colored-labeled.svg and ntut-colored.svg files into the docs/map folder of Android project.
