@@ -45,6 +45,15 @@ With Labels: ntut-colored-labeled.svg
 
 Without Labels: ntut-colored.svg
 
-## 5. Add the SVG to the Android project
+## 5. Minify SVG content using SVGOMG
 
-Place the generated ntut-colored-labeled.svg and ntut-colored.svg files into the docs/map folder of Android project.
+After editing with Inkscape, some editor metadata will be added into the SVG, making the file larger than necessary.
+With [SVGOMG](https://svgomg.net/), we can remove editor data, cleanup whitespace and more to save space and decrease
+loading times.
+
+After minifying, our SVG is 64% smaller than the original file without sacrificing quality.
+
+## 6. Add the SVG to the Android project
+
+Place the minified `ntut-colored-min.svg` into `app/src/main/assets`. This is where the AndroidSVG library will read the
+file from.
