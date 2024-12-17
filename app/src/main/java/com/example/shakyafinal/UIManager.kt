@@ -2,6 +2,7 @@ package com.example.shakyafinal
 
 import android.widget.*
 import android.content.Context
+import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import java.util.Calendar
 
@@ -9,7 +10,7 @@ class UIManager(
     private val context: Context,
     private val databaseManager: DatabaseManager,
     private val edTask: EditText,
-    private val edTime: EditText,
+    private val edDateTime: EditText,
     private val btnInsert: Button,
     private val btnUpdate: Button,
     private val btnDelete: Button,
@@ -37,32 +38,34 @@ class UIManager(
 
     // 初始化時間選擇器邏輯
     private fun setupTimePicker() {
-        edTime.setOnClickListener {
+        edDateTime.setOnClickListener {
             val calendar = Calendar.getInstance()
-            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-            val minute = calendar.get(Calendar.MINUTE)
 
-            // 顯示時間選擇器
-            val timePickerDialog = TimePickerDialog(context, { _, selectedHour, selectedMinute ->
-                val formattedTime = String.format("%02d:%02d", selectedHour, selectedMinute)
-                edTime.setText(formattedTime) // 將選擇的時間顯示在輸入框中
-            }, hour, minute, true) // true 表示使用 24 小時制
+            // 日期選擇器
+            DatePickerDialog(context, { _, year, month, dayOfMonth ->
+                val selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
 
-            timePickerDialog.show()
+                // 時間選擇器
+                TimePickerDialog(context, { _, hour, minute ->
+                    val selectedTime = String.format("%02d:%02d", hour, minute)
+                    edDateTime.setText("$selectedDate $selectedTime")
+                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
+
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
         }
     }
 
     // 處理新增操作
     private fun handleInsert() {
         val task = edTask.text.toString().trim()
-        val time = edTime.text.toString().trim()
+        val time = edDateTime.text.toString().trim()
         if (task.isEmpty() || time.isEmpty()) {
             showToast("請輸入待辦事項與時間")
         } else {
             if (databaseManager.insertTask(task, time)) {
                 showToast("新增成功：$task ($time)")
                 edTask.text.clear()
-                edTime.text.clear()
+                edDateTime.text.clear()
                 handleQuery() // 自動查詢最新資料
             } else {
                 showToast("新增失敗：待辦事項已存在")
@@ -73,14 +76,14 @@ class UIManager(
     // 處理更新操作
     private fun handleUpdate() {
         val task = edTask.text.toString().trim()
-        val time = edTime.text.toString().trim()
+        val time = edDateTime.text.toString().trim()
         if (task.isEmpty() || time.isEmpty()) {
             showToast("請輸入待辦事項與時間")
         } else {
             if (databaseManager.updateTask(task, time)) {
                 showToast("更新成功：$task 的時間修改為 $time")
                 edTask.text.clear()
-                edTime.text.clear()
+                edDateTime.text.clear()
                 handleQuery() // 自動查詢最新資料
             } else {
                 showToast("更新失敗：待辦事項不存在")
@@ -97,7 +100,7 @@ class UIManager(
             if (databaseManager.deleteTask(task)) {
                 showToast("刪除成功：$task")
                 edTask.text.clear()
-                edTime.text.clear()
+                edDateTime.text.clear()
                 handleQuery() // 自動查詢最新資料
             } else {
                 showToast("刪除失敗：待辦事項不存在")
