@@ -45,18 +45,20 @@
         app:layout_constraintTop_toBottomOf="@id/task_label"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- 時間輸入框 -->
+    <!-- 時間選擇框 -->
     <EditText
         android:id="@+id/ed_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="請輸入時間 (例如：14:00)"
-        android:inputType="time"
+        android:hint="選擇時間"
+        android:focusable="false"
+        android:inputType="none"
         android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@id/time_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBaseline_toBaselineOf="@id/time_label"
         android:layout_marginEnd="16dp" />
+
 
     <!-- 功能按鈕群組 -->
     <LinearLayout

@@ -2,6 +2,8 @@ package com.example.shakyafinal
 
 import android.widget.*
 import android.content.Context
+import android.app.TimePickerDialog
+import java.util.Calendar
 
 class UIManager(
     private val context: Context,
@@ -21,7 +23,8 @@ class UIManager(
     init {
         listView.adapter = adapter
         setupButtonListeners()
-        handleQuery() // 初始化時先查詢所有資料
+        setupTimePicker() // 初始化時間選擇器
+        handleQuery() // 初始查詢
     }
 
     // 設定按鈕的點擊事件
@@ -30,6 +33,23 @@ class UIManager(
         btnUpdate.setOnClickListener { handleUpdate() }
         btnDelete.setOnClickListener { handleDelete() }
         btnQuery.setOnClickListener { handleQuery() }
+    }
+
+    // 初始化時間選擇器邏輯
+    private fun setupTimePicker() {
+        edTime.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            // 顯示時間選擇器
+            val timePickerDialog = TimePickerDialog(context, { _, selectedHour, selectedMinute ->
+                val formattedTime = String.format("%02d:%02d", selectedHour, selectedMinute)
+                edTime.setText(formattedTime) // 將選擇的時間顯示在輸入框中
+            }, hour, minute, true) // true 表示使用 24 小時制
+
+            timePickerDialog.show()
+        }
     }
 
     // 處理新增操作
