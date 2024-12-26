@@ -5,9 +5,8 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class MyDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
-
     companion object {
-        private const val DATABASE_NAME = "todoDatabase.db" // 資料庫名稱
+        private const val DATABASE_NAME = "todo.db" // 資料庫名稱
         private const val DATABASE_VERSION = 1 // 資料庫版本
     }
 
