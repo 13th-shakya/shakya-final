@@ -22,7 +22,6 @@
             app:title="待辦事項">
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:elevation="0dp" />
@@ -49,17 +48,17 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/task_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="待辦事項："
+                    android:text="@string/tv_task"
                     android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/ed_task"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="請輸入待辦事項"
+                    android:autofillHints=""
+                    android:hint="@string/tv_task_hint"
                     android:inputType="text"
                     android:layout_marginStart="8dp" />
             </LinearLayout>
@@ -71,23 +70,22 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/time_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="時間："
+                    android:text="@string/tv_time"
                     android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/ed_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="選擇日期與時間"
+                    android:autofillHints=""
+                    android:hint="@string/ed_time_hint"
                     android:inputType="datetime"
                     android:layout_marginStart="8dp" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/button_group"
                 style="?android:attr/buttonBarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -101,7 +99,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"
                     android:layout_weight="1"
-                    android:text="新增" />
+                    android:text="@string/btn_task_insert" />
 
                 <Button
                     android:id="@+id/btn_update"
@@ -110,7 +108,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"
                     android:layout_weight="1"
-                    android:text="修改" />
+                    android:text="@string/btn_task_update" />
 
                 <Button
                     android:id="@+id/btn_delete"
@@ -119,7 +117,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"
                     android:layout_weight="1"
-                    android:text="刪除" />
+                    android:text="@string/btn_task_delete" />
 
                 <Button
                     android:id="@+id/btn_query"
@@ -127,7 +125,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="查詢" />
+                    android:text="@string/btn_task_query" />
             </LinearLayout>
 
             <!-- 列表顯示待辦事項與時間 -->
