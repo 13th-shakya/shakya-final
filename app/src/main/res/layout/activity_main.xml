@@ -15,6 +15,7 @@
         android:layout_height="50dp"
         android:scaleType="centerCrop"
         android:src="@drawable/todo"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,11 +26,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="待辦事項："
-        android:textSize="18sp"
         android:layout_marginStart="16dp"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/ed_task"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_image"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintTop_toTopOf="@id/ed_task" />
 
     <!-- 待辦事項輸入框 -->
     <EditText
@@ -39,10 +40,11 @@
         android:hint="請輸入待辦事項"
         android:inputType="text"
         android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/task_label"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBaseline_toBaselineOf="@id/task_label"
-        android:layout_marginEnd="16dp" />
+        app:layout_constraintStart_toEndOf="@id/task_label"
+        app:layout_constraintTop_toBottomOf="@+id/header_image" />
 
     <!-- 時間標籤 -->
     <TextView
@@ -50,11 +52,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="時間："
-        android:textSize="18sp"
-        android:layout_marginTop="24dp"
         android:layout_marginStart="16dp"
-        app:layout_constraintTop_toBottomOf="@id/task_label"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/ed_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ed_time" />
 
     <!-- 時間選擇框 -->
     <EditText
@@ -63,12 +65,13 @@
         android:layout_height="wrap_content"
         android:hint="選擇日期與時間"
         android:focusable="false"
-        android:inputType="none"
+        android:inputType="datetime"
         android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/time_label"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/ed_task"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBaseline_toBaselineOf="@id/time_label"
-        android:layout_marginEnd="16dp" />
+        app:layout_constraintStart_toEndOf="@id/time_label" />
 
     <!-- 功能按鈕群組 -->
     <LinearLayout
@@ -76,7 +79,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/ed_time"
