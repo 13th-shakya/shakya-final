@@ -58,7 +58,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints=""
-                    android:hint="@string/tv_task_hint"
+                    android:hint="@string/ed_task_hint"
                     android:inputType="text"
                     android:layout_marginStart="8dp" />
             </LinearLayout>
