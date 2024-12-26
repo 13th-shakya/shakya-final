@@ -76,6 +76,7 @@
     <!-- 功能按鈕群組 -->
     <LinearLayout
         android:id="@+id/button_group"
+        style="?android:attr/buttonBarStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -88,6 +89,7 @@
 
         <Button
             android:id="@+id/btn_insert"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
@@ -96,6 +98,7 @@
 
         <Button
             android:id="@+id/btn_update"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
@@ -104,6 +107,7 @@
 
         <Button
             android:id="@+id/btn_delete"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
@@ -112,6 +116,7 @@
 
         <Button
             android:id="@+id/btn_query"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
