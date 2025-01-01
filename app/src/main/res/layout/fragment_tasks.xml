@@ -65,22 +65,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
 
-                <TextView
+                <Button
+                    android:id="@+id/btn_date"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:text="@string/btn_select_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/tv_time"
-                    android:textSize="16sp" />
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp" />
 
-                <EditText
-                    android:id="@+id/ed_date"
-                    android:layout_width="match_parent"
+                <Button
+                    android:id="@+id/btn_time"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:text="@string/btn_select_time"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:autofillHints=""
-                    android:hint="@string/ed_time_hint"
-                    android:inputType="datetime"
-                    android:layout_marginStart="8dp" />
+                    android:layout_weight="1" />
+
             </LinearLayout>
 
             <LinearLayout
