@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_tasks" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_tasks"
         android:name="com.example.shakyafinal.TasksFragment"
         android:label="@string/title_tasks"
         tools:layout="@layout/fragment_tasks" />
