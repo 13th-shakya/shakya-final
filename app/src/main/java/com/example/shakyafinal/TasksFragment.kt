@@ -2,7 +2,6 @@ package com.example.shakyafinal
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,8 +10,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.room.Room
 import com.example.shakyafinal.databinding.FragmentTasksBinding
-import com.example.shakyafinal.task.Task
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -33,18 +32,15 @@ class TasksFragment : Fragment() {
     ): View? {
         _binding = FragmentTasksBinding.inflate(inflater, container, false)
 
+        val db = Room.databaseBuilder(
+            requireContext(),
+            AppDatabase::class.java, "task"
+        ).build()
+        val taskDao = db.taskDao()
+
         adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1)
         binding.listView.adapter = adapter
-
-        val viewModel = ViewModelProvider(this)[TasksViewModel::class.java]
-
-        with(viewModel) {
-            loadTasks()
-            tasks.observe(viewLifecycleOwner) { tasks ->
-                adapter.clear()
-                adapter.addAll(tasks.map { it.toString() })
-            }
-        }
+        adapter.addAll(taskDao.getAll().map { it.toString() })
 
         binding.btnInsert.setOnClickListener {
             val title = getTitle()
@@ -54,12 +50,10 @@ class TasksFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val task = Task(null, title, date, "")
-            if (viewModel.addTask(task)) {
-                showToast("新增成功：$task ($date)")
-            } else {
-                showToast("新增失敗：待辦事項已存在")
-            }
+            val task = Task(0, title, date, "location")
+            taskDao.insert(task)
+            showToast("新增成功：$task ($date)")
+//            showToast("新增失敗：待辦事項已存在")
         }
 
         binding.btnUpdate.setOnClickListener {
@@ -70,12 +64,10 @@ class TasksFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val task = Task(null, title, time, "")
-            if (viewModel.updateTask(title, task)) {
-                showToast("更新成功：$title 的時間修改為 $time")
-            } else {
-                showToast("更新失敗：待辦事項不存在")
-            }
+            val task = Task(0, title, time, "")
+            taskDao.update(task)
+            showToast("更新成功：$title 的時間修改為 $time")
+//            showToast("更新失敗：待辦事項不存在")
         }
 
         binding.btnDelete.setOnClickListener {
@@ -85,11 +77,13 @@ class TasksFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            if (viewModel.deleteTask(title)) {
-                showToast("刪除成功：$title")
-            } else {
+            val task = taskDao.findByTitle(title)
+            if (task == null) {
                 showToast("刪除失敗：待辦事項不存在")
+                return@setOnClickListener
             }
+            taskDao.delete(task)
+            showToast("刪除成功：$title")
         }
 
         binding.btnQuery.isEnabled = false
