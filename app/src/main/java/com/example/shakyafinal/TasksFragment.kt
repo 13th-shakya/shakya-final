@@ -10,19 +10,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import com.example.shakyafinal.databinding.FragmentTasksBinding
+import com.example.shakyafinal.task.Task
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class TasksFragment : Fragment() {
     private var _binding: FragmentTasksBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: TasksViewModel by activityViewModels()
-
-    private val items = ArrayList<String>()
     private lateinit var adapter: ArrayAdapter<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,79 +33,82 @@ class TasksFragment : Fragment() {
     ): View? {
         _binding = FragmentTasksBinding.inflate(inflater, container, false)
 
-        val context = activity
-        adapter = ArrayAdapter(activity, android.R.layout.simple_list_item_1, adapter)
+        adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1)
         binding.listView.adapter = adapter
 
+        val viewModel = ViewModelProvider(this)[TasksViewModel::class.java]
+
+        with(viewModel) {
+            loadTasks()
+            tasks.observe(viewLifecycleOwner) { tasks ->
+                adapter.clear()
+                adapter.addAll(tasks.map { it.toString() })
+            }
+        }
+
         binding.btnInsert.setOnClickListener {
-            val task = binding.edTask.text.toString().trim()
-            val time = binding.edDate.text.toString().trim()
-            if (task.isEmpty() || time.isEmpty()) {
+            val title = getTitle()
+            val date = getDate()
+            if (title == null || date == null) {
                 showToast("請輸入待辦事項與時間")
+                return@setOnClickListener
+            }
+
+            val task = Task(null, title, date, "")
+            if (viewModel.addTask(task)) {
+                showToast("新增成功：$task ($date)")
             } else {
-                if (databaseManager.insertTask(task, time)) {
-                    showToast("新增成功：$task ($time)")
-                    binding.edTask.text.clear()
-                    binding.edDate.text.clear()
-                    handleQuery() // 自動查詢最新資料
-                } else {
-                    showToast("新增失敗：待辦事項已存在")
-                }
+                showToast("新增失敗：待辦事項已存在")
             }
         }
 
         binding.btnUpdate.setOnClickListener {
-            val task = binding.edTask.text.toString().trim()
-            val time = binding.edDateTime.text.toString().trim()
-            if (task.isEmpty() || time.isEmpty()) {
+            val title = getTitle()
+            val time = getDate()
+            if (title == null || time == null) {
                 showToast("請輸入待辦事項與時間")
+                return@setOnClickListener
+            }
+
+            val task = Task(null, title, time, "")
+            if (viewModel.updateTask(title, task)) {
+                showToast("更新成功：$title 的時間修改為 $time")
             } else {
-                if (databaseManager.updateTask(task, time)) {
-                    showToast("更新成功：$task 的時間修改為 $time")
-                    binding.edTask.text.clear()
-                    binding.edDate.text.clear()
-                    handleQuery() // 自動查詢最新資料
-                } else {
-                    showToast("更新失敗：待辦事項不存在")
-                }
+                showToast("更新失敗：待辦事項不存在")
             }
         }
 
         binding.btnDelete.setOnClickListener {
-            val task = binding.edTask.text.toString().trim()
-            if (task.isEmpty()) {
+            val title = getTitle()
+            if (title == null) {
                 showToast("請輸入待辦事項名稱")
+                return@setOnClickListener
+            }
+
+            if (viewModel.deleteTask(title)) {
+                showToast("刪除成功：$title")
             } else {
-                if (databaseManager.deleteTask(task)) {
-                    showToast("刪除成功：$task")
-                    binding.edTask.text.clear()
-                    binding.edDate.text.clear()
-                    handleQuery() // 自動查詢最新資料
-                } else {
-                    showToast("刪除失敗：待辦事項不存在")
-                }
+                showToast("刪除失敗：待辦事項不存在")
             }
         }
 
-        binding.btnQuery.setOnClickListener { handleQuery() }
+        binding.btnQuery.isEnabled = false
 
         binding.edDate.setOnClickListener {
             val calendar = Calendar.getInstance()
 
             // 日期選擇器
-            DatePickerDialog(context, { _, year, month, dayOfMonth ->
+            DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
                 val selectedDate = String.format(Locale("zh_TW"), "%04d-%02d-%02d", year, month + 1, dayOfMonth)
 
                 // 時間選擇器
-                TimePickerDialog(context, { _, hour, minute ->
+                TimePickerDialog(requireContext(), { _, hour, minute ->
                     val selectedTime = String.format(Locale("zh_TW"), "%02d:%02d", hour, minute)
                     binding.edDate.setText("$selectedDate $selectedTime")
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
 
             }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
         }
-
-        handleQuery() // 初始查詢
 
         return binding.root
     }
@@ -117,23 +118,20 @@ class TasksFragment : Fragment() {
         _binding = null
     }
 
-    // 處理查詢操作
-    private fun handleQuery() {
-        val task = binding.edTask.text.toString().trim()
-        val results = databaseManager.queryTasks(task)
-        items.clear()
-        if (results.isEmpty()) {
-            showToast("未找到相關的待辦事項")
-        } else {
-            results.forEach { (taskName, taskTime) ->
-                items.add("待辦事項: $taskName  |  時間: $taskTime")
-            }
-        }
-        adapter.notifyDataSetChanged()
-    }
-
     // 顯示 Toast 訊息
     private fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun getTitle(): String? {
+        val title = binding.edTitle.text.toString().trim()
+        if (title.isEmpty()) return null
+        return title
+    }
+
+    private fun getDate(): Date? {
+        val date = binding.edDate.text.toString().trim()
+        if (date.isEmpty()) return null
+        return Date(date)
     }
 }
