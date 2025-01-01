@@ -1,5 +1,6 @@
 package com.example.shakyafinal
 
+import android.content.Context
 import androidx.room.*
 import java.util.Date
 
@@ -7,6 +8,24 @@ import java.util.Date
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
+
+        fun getInstance(context: Context): AppDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java, "task"
+                )
+                    .allowMainThreadQueries()
+                    .build()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
 }
 
 @Entity

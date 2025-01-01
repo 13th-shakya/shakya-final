@@ -32,10 +32,7 @@ class TasksFragment : Fragment() {
     ): View? {
         _binding = FragmentTasksBinding.inflate(inflater, container, false)
 
-        val db = Room.databaseBuilder(
-            requireContext(),
-            AppDatabase::class.java, "task"
-        ).build()
+        val db = AppDatabase.getInstance(requireContext())
         val taskDao = db.taskDao()
 
         adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1)
