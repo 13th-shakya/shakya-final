@@ -1,26 +1,28 @@
 package com.example.shakyafinal
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.format.DateFormat.is24HourFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
-import androidx.room.Room
+import androidx.fragment.app.Fragment
 import com.example.shakyafinal.databinding.FragmentTasksBinding
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
+import java.text.DateFormat
+import java.util.*
 
 class TasksFragment : Fragment() {
     private var _binding: FragmentTasksBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var adapter: ArrayAdapter<String>
+    private var selectedDateInMillis = 0L
+    private var selectedHour = 0
+    private var selectedMinute = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,20 +83,44 @@ class TasksFragment : Fragment() {
 
         binding.btnQuery.isEnabled = false
 
-        binding.edDate.setOnClickListener {
-            val calendar = Calendar.getInstance()
+        binding.btnDate.setOnClickListener {
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build()
 
-            // 日期選擇器
-            DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
-                val selectedDate = String.format(Locale("zh_TW"), "%04d-%02d-%02d", year, month + 1, dayOfMonth)
+            datePicker.addOnPositiveButtonClickListener {
+                showToast(datePicker.selection.toString())
+                selectedDateInMillis = it
+                binding.btnDate.text = DateFormat.getDateInstance().format(it)
+                binding.btnTime.isEnabled = true
+            }
 
-                // 時間選擇器
-                TimePickerDialog(requireContext(), { _, hour, minute ->
-                    val selectedTime = String.format(Locale("zh_TW"), "%02d:%02d", hour, minute)
-                    binding.edDate.setText("$selectedDate $selectedTime")
-                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
+            datePicker.show(activity!!.supportFragmentManager, "datepicker")
+        }
 
-            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+        binding.btnTime.isEnabled = false
+        binding.btnTime.setOnClickListener {
+            val isSystem24Hour = is24HourFormat(requireContext())
+            val clockFormat = if (isSystem24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
+            val timePicker = MaterialTimePicker.Builder()
+                .setTimeFormat(clockFormat)
+                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                .build()
+
+            timePicker.addOnPositiveButtonClickListener {
+                selectedHour = timePicker.hour
+                selectedMinute = timePicker.minute
+
+                val time = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, selectedHour)
+                    set(Calendar.MINUTE, selectedMinute)
+                    set(Calendar.SECOND, 0)
+                }.time
+
+                binding.btnTime.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(time)
+            }
+
+            timePicker.show(activity!!.supportFragmentManager, "timepicker")
         }
 
         return binding.root
@@ -116,9 +142,10 @@ class TasksFragment : Fragment() {
         return title
     }
 
-    private fun getDate(): Date? {
-        val date = binding.edDate.text.toString().trim()
-        if (date.isEmpty()) return null
-        return Date(date)
-    }
+    private fun getDate() = Calendar.getInstance().apply {
+        timeInMillis = selectedDateInMillis
+        set(Calendar.HOUR_OF_DAY, selectedHour)
+        set(Calendar.MINUTE, selectedMinute)
+        set(Calendar.SECOND, 0)
+    }.time
 }
