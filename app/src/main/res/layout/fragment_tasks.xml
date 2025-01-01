@@ -71,7 +71,7 @@
                 <Button
                     android:id="@+id/btn_date"
                     style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:text="選擇日期"
+                    android:text="@string/btn_select_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -80,7 +80,7 @@
                 <Button
                     android:id="@+id/btn_time"
                     style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:text="選擇時間"
+                    android:text="@string/btn_select_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
