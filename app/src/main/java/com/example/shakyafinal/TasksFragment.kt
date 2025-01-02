@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.shakyafinal.databinding.FragmentTasksBinding
@@ -19,7 +20,7 @@ class TasksFragment : Fragment() {
     private var _binding: FragmentTasksBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var adapter: ArrayAdapter<String>
+    private lateinit var adapter: ArrayAdapter<Task>
     private var selectedDateInMillis = 0L
     private var selectedHour = 0
     private var selectedMinute = 0
@@ -33,7 +34,18 @@ class TasksFragment : Fragment() {
         val db = AppDatabase.getInstance(requireContext())
         val taskDao = db.taskDao()
 
-        adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1)
+        val tasks = taskDao.getAll()
+        adapter = object : ArrayAdapter<Task>(requireContext(), android.R.layout.simple_list_item_2, android.R.id.text1, tasks) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                val textView1 = view.findViewById<TextView>(android.R.id.text1)
+                val textView2 = view.findViewById<TextView>(android.R.id.text2)
+                val task = tasks[position]
+                textView1.text = task.title
+                textView2.text = "${DateFormat.getInstance().format(task.date)}・${task.location}"
+                return view
+            }
+        }
         binding.listView.adapter = adapter
         refreshListView(taskDao)
 
@@ -153,9 +165,8 @@ class TasksFragment : Fragment() {
     }.time
 
     private fun refreshListView(taskDao: TaskDao) {
-        val tasks = taskDao.getAll().map { it.toString() }
         adapter.clear()
-        adapter.addAll(tasks)
+        adapter.addAll(taskDao.getAll())
         adapter.notifyDataSetChanged()
     }
 }
