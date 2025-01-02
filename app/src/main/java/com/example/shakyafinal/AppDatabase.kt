@@ -41,8 +41,8 @@ interface TaskDao {
     @Query("SELECT * FROM Task")
     fun getAll(): List<Task>
 
-    @Query("SELECT * FROM Task WHERE title LIKE :title")
-    fun findByTitle(title: String): Task?
+    @Query("SELECT * FROM Task WHERE title LIKE '%' || :title || '%'")
+    fun findByTitle(title: String): List<Task>
 
     @Insert
     fun insert(vararg tasks: Task)
