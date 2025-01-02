@@ -1,6 +1,8 @@
 package com.example.shakyafinal
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.text.format.DateFormat.is24HourFormat
 import android.view.LayoutInflater
 import android.view.View
@@ -48,6 +50,19 @@ class TasksFragment : Fragment() {
         }
         binding.listView.adapter = adapter
         refreshListView(taskDao)
+
+        binding.edTitle.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s.toString().trim()
+                val tasks = taskDao.findByTitle(query)
+                adapter.clear()
+                adapter.addAll(tasks)
+                adapter.notifyDataSetChanged()
+            }
+        })
 
         binding.btnDate.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker()
@@ -127,16 +142,14 @@ class TasksFragment : Fragment() {
             }
 
             val task = taskDao.findByTitle(title)
-            if (task == null) {
+            if (task.isEmpty()) {
                 showToast("刪除失敗：待辦事項不存在")
                 return@setOnClickListener
             }
-            taskDao.delete(task)
+            task.forEach { taskDao.delete(it) }
             refreshListView(taskDao)
             showToast("刪除成功：$title")
         }
-
-        binding.btnQuery.isEnabled = false
 
         return binding.root
     }

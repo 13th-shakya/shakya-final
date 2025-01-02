@@ -121,17 +121,8 @@
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
                     android:layout_weight="1"
                     android:text="@string/btn_task_delete" />
-
-                <Button
-                    android:id="@+id/btn_query"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/btn_task_query" />
             </LinearLayout>
 
             <!-- 列表顯示待辦事項與時間 -->
