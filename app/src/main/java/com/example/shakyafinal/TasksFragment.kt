@@ -37,6 +37,46 @@ class TasksFragment : Fragment() {
         binding.listView.adapter = adapter
         refreshListView(taskDao)
 
+        binding.btnDate.setOnClickListener {
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build()
+
+            datePicker.addOnPositiveButtonClickListener {
+                showToast(datePicker.selection.toString())
+                selectedDateInMillis = it
+                binding.btnDate.text = DateFormat.getDateInstance().format(it)
+                binding.btnTime.isEnabled = true
+            }
+
+            datePicker.show(activity!!.supportFragmentManager, "datepicker")
+        }
+
+        binding.btnTime.isEnabled = false
+        binding.btnTime.setOnClickListener {
+            val isSystem24Hour = is24HourFormat(requireContext())
+            val clockFormat = if (isSystem24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
+            val timePicker = MaterialTimePicker.Builder()
+                .setTimeFormat(clockFormat)
+                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                .build()
+
+            timePicker.addOnPositiveButtonClickListener {
+                selectedHour = timePicker.hour
+                selectedMinute = timePicker.minute
+
+                val time = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, selectedHour)
+                    set(Calendar.MINUTE, selectedMinute)
+                    set(Calendar.SECOND, 0)
+                }.time
+
+                binding.btnTime.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(time)
+            }
+
+            timePicker.show(activity!!.supportFragmentManager, "timepicker")
+        }
+
         binding.btnInsert.setOnClickListener {
             val title = getTitle()
             val date = getDate()
@@ -85,46 +125,6 @@ class TasksFragment : Fragment() {
         }
 
         binding.btnQuery.isEnabled = false
-
-        binding.btnDate.setOnClickListener {
-            val datePicker = MaterialDatePicker.Builder.datePicker()
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build()
-
-            datePicker.addOnPositiveButtonClickListener {
-                showToast(datePicker.selection.toString())
-                selectedDateInMillis = it
-                binding.btnDate.text = DateFormat.getDateInstance().format(it)
-                binding.btnTime.isEnabled = true
-            }
-
-            datePicker.show(activity!!.supportFragmentManager, "datepicker")
-        }
-
-        binding.btnTime.isEnabled = false
-        binding.btnTime.setOnClickListener {
-            val isSystem24Hour = is24HourFormat(requireContext())
-            val clockFormat = if (isSystem24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
-            val timePicker = MaterialTimePicker.Builder()
-                .setTimeFormat(clockFormat)
-                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-                .build()
-
-            timePicker.addOnPositiveButtonClickListener {
-                selectedHour = timePicker.hour
-                selectedMinute = timePicker.minute
-
-                val time = Calendar.getInstance().apply {
-                    set(Calendar.HOUR_OF_DAY, selectedHour)
-                    set(Calendar.MINUTE, selectedMinute)
-                    set(Calendar.SECOND, 0)
-                }.time
-
-                binding.btnTime.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(time)
-            }
-
-            timePicker.show(activity!!.supportFragmentManager, "timepicker")
-        }
 
         return binding.root
     }
