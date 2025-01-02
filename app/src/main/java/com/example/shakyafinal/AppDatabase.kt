@@ -48,10 +48,10 @@ interface TaskDao {
     fun insert(vararg tasks: Task)
 
     @Update
-    fun update(vararg tasks: Task)
+    fun update(vararg tasks: Task): Int
 
     @Delete
-    fun delete(vararg tasks: Task)
+    fun delete(vararg tasks: Task): Int
 }
 
 class Converters {
