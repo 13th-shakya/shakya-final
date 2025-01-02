@@ -35,7 +35,7 @@ class TasksFragment : Fragment() {
 
         adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1)
         binding.listView.adapter = adapter
-        adapter.addAll(taskDao.getAll().map { it.toString() })
+        refreshListView(taskDao)
 
         binding.btnInsert.setOnClickListener {
             val title = getTitle()
@@ -47,21 +47,23 @@ class TasksFragment : Fragment() {
 
             val task = Task(0, title, date, "location")
             taskDao.insert(task)
+            refreshListView(taskDao)
             showToast("新增成功：$task ($date)")
 //            showToast("新增失敗：待辦事項已存在")
         }
 
         binding.btnUpdate.setOnClickListener {
             val title = getTitle()
-            val time = getDate()
-            if (title == null || time == null) {
+            val date = getDate()
+            if (title == null || date == null) {
                 showToast("請輸入待辦事項與時間")
                 return@setOnClickListener
             }
 
-            val task = Task(0, title, time, "")
+            val task = Task(0, title, date, "")
             taskDao.update(task)
-            showToast("更新成功：$title 的時間修改為 $time")
+            refreshListView(taskDao)
+            showToast("更新成功：$title 的時間修改為 $date")
 //            showToast("更新失敗：待辦事項不存在")
         }
 
@@ -78,6 +80,7 @@ class TasksFragment : Fragment() {
                 return@setOnClickListener
             }
             taskDao.delete(task)
+            refreshListView(taskDao)
             showToast("刪除成功：$title")
         }
 
@@ -148,4 +151,11 @@ class TasksFragment : Fragment() {
         set(Calendar.MINUTE, selectedMinute)
         set(Calendar.SECOND, 0)
     }.time
+
+    private fun refreshListView(taskDao: TaskDao) {
+        val tasks = taskDao.getAll().map { it.toString() }
+        adapter.clear()
+        adapter.addAll(tasks)
+        adapter.notifyDataSetChanged()
+    }
 }
