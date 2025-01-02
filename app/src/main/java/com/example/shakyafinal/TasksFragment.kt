@@ -33,12 +33,12 @@ class TasksFragment : Fragment() {
     ): View? {
         _binding = FragmentTasksBinding.inflate(inflater, container, false)
 
-        val db = AppDatabase.getInstance(requireContext())
+        val ctx = requireContext()
+        val db = AppDatabase.getInstance(ctx)
         val taskDao = db.taskDao()
 
         val tasks = taskDao.getAll()
-        adapter = object :
-            ArrayAdapter<Task>(requireContext(), android.R.layout.simple_list_item_2, android.R.id.text1, tasks) {
+        adapter = object : ArrayAdapter<Task>(ctx, android.R.layout.simple_list_item_2, android.R.id.text1, tasks) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = super.getView(position, convertView, parent)
                 val textView1 = view.findViewById<TextView>(android.R.id.text1)
@@ -82,7 +82,7 @@ class TasksFragment : Fragment() {
 
         binding.btnTime.isEnabled = false
         binding.btnTime.setOnClickListener {
-            val isSystem24Hour = is24HourFormat(requireContext())
+            val isSystem24Hour = is24HourFormat(ctx)
             val clockFormat = if (isSystem24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
             val timePicker = MaterialTimePicker.Builder()
                 .setTimeFormat(clockFormat)
