@@ -49,7 +49,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/tv_task"
+                    android:text="@string/tv_title"
                     android:textSize="16sp" />
 
                 <EditText
@@ -57,7 +57,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints=""
-                    android:hint="@string/ed_task_hint"
+                    android:hint="@string/ed_title_hint"
                     android:inputType="text"
                     android:selectAllOnFocus="true"
                     android:layout_marginStart="8dp" />
@@ -121,17 +121,8 @@
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
                     android:layout_weight="1"
                     android:text="@string/btn_task_delete" />
-
-                <Button
-                    android:id="@+id/btn_query"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/btn_task_query" />
             </LinearLayout>
 
             <!-- 列表顯示待辦事項與時間 -->

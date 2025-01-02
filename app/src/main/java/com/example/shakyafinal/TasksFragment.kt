@@ -1,11 +1,14 @@
 package com.example.shakyafinal
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.text.format.DateFormat.is24HourFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.shakyafinal.databinding.FragmentTasksBinding
@@ -19,10 +22,10 @@ class TasksFragment : Fragment() {
     private var _binding: FragmentTasksBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var adapter: ArrayAdapter<String>
-    private var selectedDateInMillis = 0L
-    private var selectedHour = 0
-    private var selectedMinute = 0
+    private lateinit var adapter: ArrayAdapter<Task>
+    private var selectedDateInMillis: Long? = null
+    private var selectedHour: Int? = null
+    private var selectedMinute: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,12 +33,37 @@ class TasksFragment : Fragment() {
     ): View? {
         _binding = FragmentTasksBinding.inflate(inflater, container, false)
 
-        val db = AppDatabase.getInstance(requireContext())
+        val ctx = requireContext()
+        val db = AppDatabase.getInstance(ctx)
         val taskDao = db.taskDao()
 
-        adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1)
+        val tasks = taskDao.getAll()
+        adapter = object : ArrayAdapter<Task>(ctx, android.R.layout.simple_list_item_2, android.R.id.text1, tasks) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                val textView1 = view.findViewById<TextView>(android.R.id.text1)
+                val textView2 = view.findViewById<TextView>(android.R.id.text2)
+                val task = tasks[position]
+                textView1.text = task.title
+                textView2.text = "${DateFormat.getInstance().format(task.date)}・${task.location}"
+                return view
+            }
+        }
         binding.listView.adapter = adapter
         refreshListView(taskDao)
+
+        binding.edTitle.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s.toString().trim()
+                val tasks = taskDao.findByTitle(query)
+                adapter.clear()
+                adapter.addAll(tasks)
+                adapter.notifyDataSetChanged()
+            }
+        })
 
         binding.btnDate.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker()
@@ -54,7 +82,7 @@ class TasksFragment : Fragment() {
 
         binding.btnTime.isEnabled = false
         binding.btnTime.setOnClickListener {
-            val isSystem24Hour = is24HourFormat(requireContext())
+            val isSystem24Hour = is24HourFormat(ctx)
             val clockFormat = if (isSystem24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
             val timePicker = MaterialTimePicker.Builder()
                 .setTimeFormat(clockFormat)
@@ -66,8 +94,8 @@ class TasksFragment : Fragment() {
                 selectedMinute = timePicker.minute
 
                 val time = Calendar.getInstance().apply {
-                    set(Calendar.HOUR_OF_DAY, selectedHour)
-                    set(Calendar.MINUTE, selectedMinute)
+                    set(Calendar.HOUR_OF_DAY, selectedHour!!)
+                    set(Calendar.MINUTE, selectedMinute!!)
                     set(Calendar.SECOND, 0)
                 }.time
 
@@ -88,8 +116,7 @@ class TasksFragment : Fragment() {
             val task = Task(0, title, date, "location")
             taskDao.insert(task)
             refreshListView(taskDao)
-            showToast("新增成功：$task ($date)")
-//            showToast("新增失敗：待辦事項已存在")
+            showToast("新增成功：${task.title} (${DateFormat.getInstance().format(date)})")
         }
 
         binding.btnUpdate.setOnClickListener {
@@ -101,10 +128,13 @@ class TasksFragment : Fragment() {
             }
 
             val task = Task(0, title, date, "")
-            taskDao.update(task)
-            refreshListView(taskDao)
-            showToast("更新成功：$title 的時間修改為 $date")
-//            showToast("更新失敗：待辦事項不存在")
+            val rows = taskDao.update(task)
+            if (rows == 0) {
+                showToast("更新失敗：待辦事項不存在")
+            } else {
+                showToast("更新成功：$title 的時間修改為 $date")
+                refreshListView(taskDao)
+            }
         }
 
         binding.btnDelete.setOnClickListener {
@@ -114,17 +144,15 @@ class TasksFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val task = taskDao.findByTitle(title)
-            if (task == null) {
+            val tasks = taskDao.findByTitle(title)
+            val rows = taskDao.delete(*tasks.toTypedArray())
+            if (rows == 0) {
                 showToast("刪除失敗：待辦事項不存在")
-                return@setOnClickListener
+            } else {
+                showToast("刪除了 $rows 個待辦事項")
+                refreshListView(taskDao)
             }
-            taskDao.delete(task)
-            refreshListView(taskDao)
-            showToast("刪除成功：$title")
         }
-
-        binding.btnQuery.isEnabled = false
 
         return binding.root
     }
@@ -145,17 +173,21 @@ class TasksFragment : Fragment() {
         return title
     }
 
-    private fun getDate() = Calendar.getInstance().apply {
-        timeInMillis = selectedDateInMillis
-        set(Calendar.HOUR_OF_DAY, selectedHour)
-        set(Calendar.MINUTE, selectedMinute)
-        set(Calendar.SECOND, 0)
-    }.time
+    private fun getDate(): Date? {
+        selectedDateInMillis ?: return null
+        selectedHour ?: return null
+        selectedMinute ?: return null
+        return Calendar.getInstance().apply {
+            timeInMillis = selectedDateInMillis!!
+            set(Calendar.HOUR_OF_DAY, selectedHour!!)
+            set(Calendar.MINUTE, selectedMinute!!)
+            set(Calendar.SECOND, 0)
+        }.time
+    }
 
     private fun refreshListView(taskDao: TaskDao) {
-        val tasks = taskDao.getAll().map { it.toString() }
         adapter.clear()
-        adapter.addAll(tasks)
+        adapter.addAll(taskDao.getAll())
         adapter.notifyDataSetChanged()
     }
 }
