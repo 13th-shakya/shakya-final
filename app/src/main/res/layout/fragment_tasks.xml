@@ -49,7 +49,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/tv_task"
+                    android:text="@string/tv_title"
                     android:textSize="16sp" />
 
                 <EditText
@@ -57,7 +57,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints=""
-                    android:hint="@string/ed_task_hint"
+                    android:hint="@string/ed_title_hint"
                     android:inputType="text"
                     android:selectAllOnFocus="true"
                     android:layout_marginStart="8dp" />

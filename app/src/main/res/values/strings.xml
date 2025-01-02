@@ -2,16 +2,15 @@
     <string name="app_name">Shakya Final</string>
     <string name="tv_time">時間：</string>
     <string name="ed_time_hint">選擇日期與時間</string>
-    <string name="tv_task">待辦事項：</string>
-    <string name="ed_task_hint">請輸入待辦事項</string>
+    <string name="tv_title">標題：</string>
+    <string name="ed_title_hint">輸入待辦事項標題</string>
+    <string name="btn_select_date">選擇日期</string>
+    <string name="btn_select_time">選擇時間</string>
     <string name="btn_task_insert">新增</string>
     <string name="btn_task_update">修改</string>
     <string name="btn_task_delete">刪除</string>
-    <string name="btn_task_query">查詢</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_map">地圖</string>
     <string name="title_tasks">待辦事項</string>
-    <string name="btn_select_date">選擇日期</string>
-    <string name="btn_select_time">選擇時間</string>
 </resources>
