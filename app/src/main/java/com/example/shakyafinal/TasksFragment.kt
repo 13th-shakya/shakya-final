@@ -35,53 +35,7 @@ class TasksFragment : Fragment() {
 
         adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1)
         binding.listView.adapter = adapter
-        adapter.addAll(taskDao.getAll().map { it.toString() })
-
-        binding.btnInsert.setOnClickListener {
-            val title = getTitle()
-            val date = getDate()
-            if (title == null || date == null) {
-                showToast("請輸入待辦事項與時間")
-                return@setOnClickListener
-            }
-
-            val task = Task(0, title, date, "location")
-            taskDao.insert(task)
-            showToast("新增成功：$task ($date)")
-//            showToast("新增失敗：待辦事項已存在")
-        }
-
-        binding.btnUpdate.setOnClickListener {
-            val title = getTitle()
-            val time = getDate()
-            if (title == null || time == null) {
-                showToast("請輸入待辦事項與時間")
-                return@setOnClickListener
-            }
-
-            val task = Task(0, title, time, "")
-            taskDao.update(task)
-            showToast("更新成功：$title 的時間修改為 $time")
-//            showToast("更新失敗：待辦事項不存在")
-        }
-
-        binding.btnDelete.setOnClickListener {
-            val title = getTitle()
-            if (title == null) {
-                showToast("請輸入待辦事項名稱")
-                return@setOnClickListener
-            }
-
-            val task = taskDao.findByTitle(title)
-            if (task == null) {
-                showToast("刪除失敗：待辦事項不存在")
-                return@setOnClickListener
-            }
-            taskDao.delete(task)
-            showToast("刪除成功：$title")
-        }
-
-        binding.btnQuery.isEnabled = false
+        refreshListView(taskDao)
 
         binding.btnDate.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker()
@@ -123,6 +77,55 @@ class TasksFragment : Fragment() {
             timePicker.show(activity!!.supportFragmentManager, "timepicker")
         }
 
+        binding.btnInsert.setOnClickListener {
+            val title = getTitle()
+            val date = getDate()
+            if (title == null || date == null) {
+                showToast("請輸入待辦事項與時間")
+                return@setOnClickListener
+            }
+
+            val task = Task(0, title, date, "location")
+            taskDao.insert(task)
+            refreshListView(taskDao)
+            showToast("新增成功：$task ($date)")
+//            showToast("新增失敗：待辦事項已存在")
+        }
+
+        binding.btnUpdate.setOnClickListener {
+            val title = getTitle()
+            val date = getDate()
+            if (title == null || date == null) {
+                showToast("請輸入待辦事項與時間")
+                return@setOnClickListener
+            }
+
+            val task = Task(0, title, date, "")
+            taskDao.update(task)
+            refreshListView(taskDao)
+            showToast("更新成功：$title 的時間修改為 $date")
+//            showToast("更新失敗：待辦事項不存在")
+        }
+
+        binding.btnDelete.setOnClickListener {
+            val title = getTitle()
+            if (title == null) {
+                showToast("請輸入待辦事項名稱")
+                return@setOnClickListener
+            }
+
+            val task = taskDao.findByTitle(title)
+            if (task == null) {
+                showToast("刪除失敗：待辦事項不存在")
+                return@setOnClickListener
+            }
+            taskDao.delete(task)
+            refreshListView(taskDao)
+            showToast("刪除成功：$title")
+        }
+
+        binding.btnQuery.isEnabled = false
+
         return binding.root
     }
 
@@ -148,4 +151,11 @@ class TasksFragment : Fragment() {
         set(Calendar.MINUTE, selectedMinute)
         set(Calendar.SECOND, 0)
     }.time
+
+    private fun refreshListView(taskDao: TaskDao) {
+        val tasks = taskDao.getAll().map { it.toString() }
+        adapter.clear()
+        adapter.addAll(tasks)
+        adapter.notifyDataSetChanged()
+    }
 }
