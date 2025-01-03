@@ -65,7 +65,7 @@ class ClassroomDataHelper {
         courseItems.filter { it.classroom.isNotEmpty() }.forEach { course ->
             course.classroom.forEach { classroom ->
                 classList.find { it["name"] == classroom.name }?.apply {
-                    val occupiedTimes = course.time[todayDayOfWeek] ?: emptyList()
+                    val occupiedTimes = getOccupiedTimes(course.time, todayDayOfWeek)
                     this["timetable"] = (this["timetable"] as List<String>).filterNot { occupiedTimes.contains(it) }
                     this["link"] = classroom.link
                 }
@@ -73,5 +73,20 @@ class ClassroomDataHelper {
         }
 
         return classList.sortedBy { it["name"] as String }
+    }
+
+
+    // Mapping day string to Time property
+    fun getOccupiedTimes(time: Time, day: String): List<String> {
+        return when (day) {
+            "sun" -> time.sun.filterIsInstance<String>()
+            "mon" -> time.mon.filterIsInstance<String>()
+            "tue" -> time.tue.filterIsInstance<String>()
+            "wed" -> time.wed.filterIsInstance<String>()
+            "thu" -> time.thu.filterIsInstance<String>()
+            "fri" -> time.fri.filterIsInstance<String>()
+            "sat" -> time.sat.filterIsInstance<String>()
+            else -> emptyList()
+        }
     }
 }
